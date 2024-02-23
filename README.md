@@ -300,7 +300,7 @@ received from the Gateway in JSON format.
 
 ## Further Questions
 - It looks like a gRPC server is global to all endpoints. Can we configure different gRPC servers for different APIs?
-- Can we configure different API endpoints to serve plugins from different GRPC servers? I am aware of grpc-proxy, but can plugins be served from different API endpoints on different gRPC serevrs?
+- Can we configure different API endpoints to serve plugins from different GRPC servers? I am aware of grpc-proxy, but can plugins be served from different API endpoints on different gRPC servers?
 
 ## Protobuf Issues
 Google Python Protobuf tooling does not generate relative import statements.
