@@ -10,21 +10,28 @@ from google.protobuf.json_format import MessageToJson
 from grpc_reflection.v1alpha import reflection
 import coprocess_object_pb2_grpc
 import coprocess_object_pb2
+from coprocess_common_pb2 import HookType
 
 
 class PythonDispatcher(coprocess_object_pb2_grpc.DispatcherServicer):
     async def Dispatch(
         self, object: coprocess_object_pb2.Object, context: grpc.aio.ServicerContext
-    ):
-        logging.info("REQUEST START")
-        logging.info(MessageToJson(object))
-        logging.info("REQUEST END")
+    ) -> coprocess_object_pb2.Object:
+        logging.info(f"REQUEST\n{MessageToJson(object)}\n")
+
+        if object.hook_type == HookType.Pre:
+            logging.info(f"Pre plugin name: {object.hook_name}")
+            logging.info(f"Activated Pre Request plugin from API: {object.spec.get('APIID')}")
+        elif object.hook_type == HookType.Response:
+            logging.info(f"Response plugin name: {object.hook_name}")
+            logging.info(f"Activated Response plugin from API: {object.spec.get('APIID')}")
 
         return object
 
     async def DispatchEvent(
         self, event: coprocess_object_pb2.Event, context: grpc.aio.ServicerContext
-    ):
+    ) -> coprocess_object_pb2.EventReply:
+
         event = json.loads(event.payload)
         logging.info(f"RECEIVED EVENT: {event}")
         return coprocess_object_pb2.EventReply()
@@ -55,11 +62,11 @@ async def shutdown_server(server) -> None:
     await server.stop(None)
 
 
-def handle_sigterm(sig, frame):
+def handle_sigterm(sig, frame) -> None:
     asyncio.create_task(shutdown_server(server))
 
 
-async def handle_sigint():
+async def handle_sigint() -> None:
     loop = asyncio.get_running_loop()
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(sig, loop.stop)

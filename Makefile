@@ -21,3 +21,6 @@ dispatch_event:
 
 petstore:
 	curl -L http://localhost:8080/pet/findByStatus?status=available
+
+jsonrpc:
+	curl -X GET http://localhost:8080/extract-json-values-grpc-server/todos
